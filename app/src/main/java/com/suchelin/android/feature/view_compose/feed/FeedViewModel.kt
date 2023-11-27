@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.suchelin.android.base.BaseViewModel
@@ -67,6 +68,14 @@ class FeedViewModel : BaseViewModel() {
                 }
             }
         }
+    }
+    @SuppressLint("SimpleDateFormat")
+    fun deletePost(postTime: String){
+        val deletePostData = hashMapOf<String, Any>(
+            postTime to FieldValue.delete(),
+        )
+        db.collection("suggest").document(docPostName.format(Date()))
+            .update(deletePostData)
     }
 
     @SuppressLint("SimpleDateFormat")

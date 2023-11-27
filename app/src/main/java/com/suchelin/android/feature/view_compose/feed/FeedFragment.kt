@@ -2,7 +2,7 @@ package com.suchelin.android.feature.view_compose.feed
 
 import android.view.View
 import android.widget.Toast
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.text.font.FontWeight
@@ -131,13 +132,19 @@ class FeedFragment :
             shape = RoundedCornerShape(6.dp),
             modifier =
             Modifier
-                .clickable {
-                    Toast
-                        .makeText(context, "${post.date}: ${post.post}", Toast.LENGTH_SHORT)
-                        .show()
-                }
                 .fillMaxWidth()
-                .padding(0.dp, 2.dp, 0.dp, 4.dp)) {
+                .padding(0.dp, 2.dp, 0.dp, 4.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            if (sharedViewModel.isManager) {
+                                viewModel.deletePost(post.date)
+                                sharedViewModel.postRefresh()
+                            }
+                        }
+                    )
+                }
+        ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier

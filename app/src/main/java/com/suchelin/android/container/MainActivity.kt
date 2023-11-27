@@ -1,6 +1,7 @@
 package com.suchelin.android.container
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -14,7 +15,6 @@ import com.suchelin.android.R
 import com.suchelin.android.base.BaseActivity
 import com.suchelin.android.databinding.ActivityMainBinding
 import com.suchelin.android.util.AdManager
-import timber.log.Timber
 
 
 class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.activity_main) {
@@ -22,7 +22,6 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
 
     private lateinit var navController: NavController
     private lateinit var auth: FirebaseAuth
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -33,15 +32,14 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>(R.layout.a
 
     override fun onStart() {
         super.onStart()
-
         auth.signInAnonymously()
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val userId = auth.currentUser?.uid
+                    viewModel.checkManager(userId!!)
                     if (!viewModel.isInit.value!!) {
                         viewModel.initData()
                     }
-                    Timber.tag("TAG").d("auth success: %s", userId)
                 }
             }
     }

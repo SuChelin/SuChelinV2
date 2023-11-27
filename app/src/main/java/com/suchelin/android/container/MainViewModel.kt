@@ -1,5 +1,6 @@
 package com.suchelin.android.container
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.Query
@@ -30,9 +31,24 @@ class MainViewModel : BaseViewModel() {
     private val _postList = mutableListOf<PostData>()
     private val _postData = MutableLiveData<List<PostData>>()
     val postData: LiveData<List<PostData>> = _postData
+    var isManager = false
     var totalStoreNumber: Int = 0
 
-
+    fun checkManager(uid: String) {
+        _db.collection("manager").get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    for (id in document.data["id"] as List<String>) {
+                        if (uid == id) isManager = true
+                        Log.d("user","$isManager")
+                    }
+                }
+                _menuData.value = _menuList
+            }
+            .addOnFailureListener { exception ->
+                Timber.tag("TAG").w(exception, "Error getting documents.")
+            }
+    }
 
     private fun loadMenuData() {
         _db.collection("menu").get()
